@@ -1,4 +1,9 @@
-package org.example.framework.services;
+package org.bitmex.services;
+
+import org.bitmex.model.constants.URL.URL;
+import org.bitmex.model.constants.Verb;
+import org.bitmex.model.order.Order;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URI;
@@ -6,11 +11,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-
-import org.example.framework.model.constants.URL.URL;
-import org.example.framework.model.constants.Verb;
-import org.example.framework.model.order.Order;
-import org.json.JSONObject;
 
 public class HttpClient {
     private String apiKey;
@@ -22,14 +22,6 @@ public class HttpClient {
     }
 
     public HttpResponse<String> sendOrder(Order order, URL url) {
-
-//        URL url = new URLBuilder() // генерация url
-//                .protocol(UtilURL.PROTOCOL)
-//                .net(UtilURL.TESTNET)
-//                .baseUrl(UtilURL.BASE_URL)
-//                .apiPath(UtilURL.API_PATH)
-//                .resourcePath(ResourceURL.ORDER)
-//                .build();
 
         String orderJsonStr = new JSONObject(order).toString();
         Signature sign = new Signature(url, Verb.POST.toString(), orderJsonStr, apiSecret);
@@ -74,7 +66,7 @@ public class HttpClient {
         HttpResponse<String> response;
 
         try {
-            response = java.net.http.HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            response = java.net.http.HttpClient.newHttpClient().send(request, BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }

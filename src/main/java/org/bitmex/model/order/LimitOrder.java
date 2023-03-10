@@ -1,11 +1,10 @@
-package org.example.framework.model.order;
+package org.bitmex.model.order;
 
-import org.example.framework.model.constants.OrderSide;
-import org.example.framework.model.constants.OrderType;
-import org.example.framework.model.constants.Symbol;
+import org.bitmex.model.constants.OrderSide;
+import org.bitmex.model.constants.OrderType;
+import org.bitmex.model.constants.Symbol;
 
 public class LimitOrder implements Order {
-
     private Symbol symbol;
     private OrderSide side;
     private OrderType ordType = OrderType.LIMIT;

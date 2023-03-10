@@ -1,4 +1,4 @@
-package org.example.framework.services.tradingAlgorithm;
+package org.bitmex.services.tradingAlgorithm;
 
 public interface TradingAlgorithm {
     void startAlgo();

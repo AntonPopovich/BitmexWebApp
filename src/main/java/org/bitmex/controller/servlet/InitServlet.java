@@ -12,16 +12,9 @@ import java.io.IOException;
 public class InitServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Создание новой сессии
         HttpSession currentSession = req.getSession(true);
-
-        // Получение списка значений поля
         ActiveBots activeBots = new ActiveBots();
-
-        // Добавление в сессию параметров поля (нужно будет для хранения состояния между запросами)
-        currentSession.setAttribute("botsGroup", activeBots);
-
-        // Перенаправление запроса на страницу index.jsp через сервер
+        currentSession.setAttribute("activeBots", activeBots);
         getServletContext().getRequestDispatcher("/index.jsp").forward(req, resp);
     }
 }

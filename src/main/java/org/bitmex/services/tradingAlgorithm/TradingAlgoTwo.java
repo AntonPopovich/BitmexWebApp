@@ -1,12 +1,15 @@
-package org.example.framework.services.tradingAlgorithm;
+package org.bitmex.services.tradingAlgorithm;
 
-import org.example.framework.services.webSocket.WebSocketRunner;
-import org.example.framework.model.Stock;
-import org.example.framework.model.constants.OrderSide;
-import org.example.framework.model.constants.URL.WsTopic;
+import org.bitmex.controller.servlet.SendFormServlet;
+import org.bitmex.model.Stock;
+import org.bitmex.model.constants.OrderSide;
+import org.bitmex.model.constants.URL.WsTopic;
+import org.bitmex.services.webSocket.WebSocketRunner;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
@@ -23,6 +26,7 @@ public class TradingAlgoTwo implements TradingAlgorithm {
     protected List<String> updatedOrdersInfo = new CopyOnWriteArrayList<>();
     private List<String> ordersId = new ArrayList<>();
     private boolean isOff = false;
+    private static final Logger log = LoggerFactory.getLogger(SendFormServlet.class.getName());
 
     public TradingAlgoTwo(Double step, short level, Double coefficient, Stock stock) {
         this.step = step;
@@ -39,13 +43,13 @@ public class TradingAlgoTwo implements TradingAlgorithm {
         threadWsr.start();
 
         Double baseMarkPrice = stock.getMarketPrice();
-        System.out.println(baseMarkPrice);
+        log.info("Сейчас marketPrice: {}", baseMarkPrice);
         while (updatedOrdersInfo.size() == 0) {}
         for (int x = 0; x < level; x++) {
             double orderPrice = Math.round(baseMarkPrice - (step * (x + 1)));
             HttpResponse<String> response = stock.sendOrder(OrderSide.BUY, orderPrice, coefficient);
             ordersId.add(stock.getOrderId(response));
-            System.out.println(orderPrice);
+            log.info("Выставлен ордер по цене: {}", orderPrice);
         }
 
         while (!isOff) {
@@ -61,7 +65,7 @@ public class TradingAlgoTwo implements TradingAlgorithm {
                     String price = param.getString("price");
                     double numericPrice = Double.parseDouble(price);
                     String side = param.getString("side");
-            System.out.println(ordStatus + " " + price + " " + side);
+                    log.info("Информация по Web Socket (реконнект) статус ордера, цена, side: {}, {}, {}, {}", ordStatus, price, side, orderID);
 
                     if (ordStatus.equals("Filled") && ordersId.contains(orderID)) {
                         OrderSide inversedSide;
@@ -74,7 +78,7 @@ public class TradingAlgoTwo implements TradingAlgorithm {
                         }
                         HttpResponse<String> response = stock.sendOrder(inversedSide, numericPrice, coefficient);
                         ordersId.add(stock.getOrderId(response));
-                        System.out.println("Выставлен контрордер: " + numericPrice);
+                        log.info("Выставлен контрордер: {}", numericPrice);
                     }
                 }
             } catch (JSONException ignored) {}
@@ -89,86 +93,3 @@ public class TradingAlgoTwo implements TradingAlgorithm {
         this.isOff = true;
     }
 }
-
-
-
-
-        // else передать сообщение на сервлет о невалидности ключей
-
-//        WebSocketRunner wsr = new WebSocketRunner(stock.getApiKey(), stock.getApiSecret());
-//        wsr.run();
-//
-//        while (true) {
-//           if (updatedOrdersInfo.size() > 0) {
-//               String id;
-//               String price;
-//               String side;
-//               try {
-//                   JSONObject jsObjSocketData = new JSONObject(updatedOrdersInfo.get(0));
-//                   JSONArray jsonArray = jsObjSocketData.getJSONArray("data");
-//                   JSONObject param = jsonArray.getJSONObject(0);
-//                   id = param.getString("orderID");
-//                   price = param.getString("price");
-//                   side = param.getString("side");
-//               } catch (JSONException js) {
-//                       throw new RuntimeException(js + " В список updatedOrdersInfo попала строка которую нельзя преобразовать в JSON файл");
-//                   }
-//               if (side.equalsIgnoreCase("buy")) {
-//                   stock.sendOrder(pair, OrderSide.SELL, Double.parseDouble(price) + step, coefficient);
-//               } else {
-//                   stock.sendOrder(pair, OrderSide.BUY, Double.parseDouble(price) - step, coefficient);
-//               }
-//               updatedOrdersInfo.remove(0);
-//           }
-//        }
-
-
-
-
-
-
-    // получить currentPrice (Http-запрос)
-    // разместить ордеры (Post) в количестве level (Http-запрос) (нет проверки на баланс)
-    // Get-запрос на каждый orderId и положить в список List
-
-    //запуск WebSocket, подписка на "order" // Live updates on your orders
-    //доставать из них orderId, price, side
-    //делать Post-запрос на продажу/покупку
-
-
-//            while (completedLevels < level) {
-//                try {
-//                    if (!markPriceLive.isEmpty()) {
-//                        String lastElement = markPriceLive.get(markPriceLive.size() - 1);
-//                        JSONObject jsObjSocketData = new JSONObject(lastElement);
-//                        JSONArray jsonArray = jsObjSocketData.getJSONArray("data");
-//                        JSONObject param = jsonArray.getJSONObject(0);
-//                        String price = param.getString("markPrice");
-//                        double mPrice = Double.parseDouble(price);
-//                        System.out.print(mPrice + " markPrice   ");
-//                        markPriceLive.clear();
-//
-//                            System.out.print(mPrice + " markPrice   ");
-//                        System.out.println(orderPrice + " orderPrice");
-//                        if (mPrice <= orderPrice) {
-//                            int numberOfOrders = (int) ((orderPrice - mPrice) / step);
-//                            System.out.println("numberOfOrders: " + numberOfOrders);
-//                            for (int i = 0; i <= numberOfOrders; i++) {
-//                                System.out.println("цикл - " + i);
-//                                stock.sendOrder(OrderSide.BUY, orderPrice, coefficient);
-//                                orderPrice = orderPrice - (step);
-//                            }
-//                            completedLevels = completedLevels + (numberOfOrders + 1);
-//                            System.out.println("completedLevels: " + completedLevels);
-//                            if (wsOrderPermission) {
-//                                // запустить поток на ордера
-//                                System.out.println("запустили поток на ордера");
-//                                wsOrderPermission = false;
-//                            }
-//                        }
-//                    }
-//                    }
-//                } catch (JSONException ignored) {}
-//            }
-//        wsrMarkPrice.stop();
-//        threadMark.interrupt();

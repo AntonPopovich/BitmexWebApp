@@ -1,6 +1,4 @@
-package org.example.framework.model.constants.URL;
-
-import java.util.Optional;
+package org.bitmex.model.constants.URL;
 
 public class URL {
   private String protocol;

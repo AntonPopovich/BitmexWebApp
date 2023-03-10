@@ -1,4 +1,4 @@
-package org.example.framework.model.constants.URL;
+package org.bitmex.model.constants.URL;
 
 public class ResourceURL {
   public static final String ORDER = "/order";

@@ -1,5 +1,5 @@
-package org.example.framework.model.constants;
+package org.bitmex.model.constants;
 
 public enum Symbol {
-  XBTUSD;
+  XBTUSD
 }

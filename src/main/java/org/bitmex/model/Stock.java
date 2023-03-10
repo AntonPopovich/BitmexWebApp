@@ -1,14 +1,14 @@
-package org.example.framework.model;
+package org.bitmex.model;
 
 import org.apache.http.client.utils.URIBuilder;
-import org.example.framework.services.HttpClient;
-import org.example.framework.model.constants.OrderSide;
-import org.example.framework.model.constants.Symbol;
-import org.example.framework.model.constants.URL.ResourceURL;
-import org.example.framework.model.constants.URL.URL;
-import org.example.framework.model.constants.URL.URLBuilder;
-import org.example.framework.model.constants.URL.UtilURL;
-import org.example.framework.model.order.LimitOrder;
+import org.bitmex.model.constants.OrderSide;
+import org.bitmex.model.constants.Symbol;
+import org.bitmex.model.constants.URL.ResourceURL;
+import org.bitmex.model.constants.URL.URL;
+import org.bitmex.model.constants.URL.URLBuilder;
+import org.bitmex.model.constants.URL.UtilURL;
+import org.bitmex.model.order.LimitOrder;
+import org.bitmex.services.HttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,8 +18,6 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
 
 public class Stock {
     private String apiKey;
@@ -41,8 +39,7 @@ public class Stock {
 
     public boolean authenticate() {
         HttpClient client = new HttpClient(apiKey, apiSecret);
-        boolean response = client.authenticate(authUrl);
-        return response;
+        return client.authenticate(authUrl);
     }
 
     public Double getMarketPrice() {
@@ -57,21 +54,6 @@ public class Stock {
             throw new RuntimeException(e);
         }
     }
-    public Optional<Double> getMarketPriceLive(List<String> markPriceLive) {
-        Optional<Double> mPrice = Optional.ofNullable(null);
-        try {
-            if (markPriceLive.size() > 0) {
-                String lastElement = markPriceLive.get(markPriceLive.size() - 1);
-                markPriceLive.clear();
-                JSONObject jsObjSocketData = new JSONObject(lastElement);
-                JSONArray jsonArray = jsObjSocketData.getJSONArray("data");
-                JSONObject param = jsonArray.getJSONObject(0);
-                String price = param.getString("markPrice");
-                mPrice = Optional.of(Double.parseDouble(price));
-            }
-        } catch (JSONException ignored) {}
-        return mPrice;
-    }
 
     public HttpResponse<String> sendOrder(OrderSide side, Double price, Double qty) {
         LimitOrder order = new LimitOrder(pair, side, price, qty);
@@ -85,14 +67,13 @@ public class Stock {
     public String getOrderId(HttpResponse<String> response) {
         try {
         JSONObject object = new JSONObject(response.body());
-        String price = object.getString("orderID");
-        return price;
+            return object.getString("orderID");
         } catch (JSONException js) {
             throw new RuntimeException(js + " Сервер отдал некорректный JSON файл");
         }
     }
     private URL createMarketPriceUrl() {
-        URI uri = null;
+        URI uri;
         try {
             uri = new URIBuilder()
                     .addParameter("filter", "{\"symbol\": \"XBTUSD\"}")
@@ -102,7 +83,7 @@ public class Stock {
             throw new RuntimeException(e);
         }
 
-        URL url = new URLBuilder() // генерация url
+        URL url = new URLBuilder()
                 .protocol(UtilURL.PROTOCOL)
                 .net(UtilURL.TESTNET)
                 .baseUrl(UtilURL.BASE_URL)
@@ -113,7 +94,7 @@ public class Stock {
     }
 
     private  URL createSendUrl() {
-        URL url = new URLBuilder() // генерация url
+        URL url = new URLBuilder()
                 .protocol(UtilURL.PROTOCOL)
                 .net(UtilURL.TESTNET)
                 .baseUrl(UtilURL.BASE_URL)
@@ -127,7 +108,7 @@ public class Stock {
         String ordersInfoParam = "{\"open\": \"true\"}"; //To get open orders only, send {"open": true} in the filter param.
         String encodeParam = "?filter=" + URLEncoder.encode(ordersInfoParam, StandardCharsets.UTF_8);
 
-        URL url = new URLBuilder() // генерация url
+        URL url = new URLBuilder()
                 .protocol(UtilURL.PROTOCOL)
                 .net(UtilURL.TESTNET)
                 .baseUrl(UtilURL.BASE_URL)

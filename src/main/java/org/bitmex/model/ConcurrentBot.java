@@ -1,10 +1,13 @@
-package org.example.framework.model;
+package org.bitmex.model;
 
-import org.example.framework.model.Bot;
+import org.bitmex.controller.servlet.SendFormServlet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConcurrentBot {
     private Bot bot;
     private Thread botThread;
+    private static final Logger log = LoggerFactory.getLogger(SendFormServlet.class.getName());
 
     public ConcurrentBot(Bot bot, Thread botThread) {
         this.bot = bot;
@@ -18,6 +21,7 @@ public class ConcurrentBot {
     public void turnOff() {
         bot.stop();
         botThread.interrupt();
+        log.info("Бот остановлен. botThread.isAlive()/isInterrupted() - {}, {}", botThread.isAlive(), botThread.isInterrupted());
     }
 
     public Bot getBot() {

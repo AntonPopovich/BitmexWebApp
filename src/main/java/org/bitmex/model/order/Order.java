@@ -1,3 +1,3 @@
-package org.example.framework.model.order;
+package org.bitmex.model.order;
 public interface Order {
 }

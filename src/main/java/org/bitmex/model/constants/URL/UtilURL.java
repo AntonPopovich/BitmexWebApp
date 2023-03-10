@@ -1,4 +1,4 @@
-package org.example.framework.model.constants.URL;
+package org.bitmex.model.constants.URL;
 
 public class UtilURL {
   public static final String PROTOCOL = "https://";

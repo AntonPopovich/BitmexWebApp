@@ -1,19 +1,21 @@
 package org.bitmex.controller.servlet;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.bitmex.model.ConcurrentBot;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ActiveBots {
-    private List<Thread> activeThreads = new ArrayList<Thread>();
+    private Map<Integer, ConcurrentBot> activeBots = new HashMap<>();
 
     public ActiveBots() {
     }
 
-    public List<Thread> getActiveThreads() {
-        return activeThreads;
+    public Map<Integer, ConcurrentBot> getActiveBots() {
+        return activeBots;
     }
 
-    public void setActiveThreads(List<Thread> activeThreads) {
-        this.activeThreads = activeThreads;
+    public String getBotApiKey(int index) {
+        return getActiveBots().get(index).getBot().getApiKey();
     }
 }

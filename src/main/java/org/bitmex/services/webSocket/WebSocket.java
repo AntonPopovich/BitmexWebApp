@@ -1,4 +1,4 @@
-package org.example.framework.services.webSocket;
+package org.bitmex.services.webSocket;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -56,6 +56,4 @@ public class WebSocket extends Endpoint{
     public void onError(Session session, Throwable throwable) {
         super.onError(session, throwable);
     }
-
-
 }

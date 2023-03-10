@@ -1,12 +1,14 @@
-package org.example.framework.model;
+package org.bitmex.model;
 
-import org.example.framework.constants.*;
-import org.example.framework.model.constants.Algo;
-import org.example.framework.model.constants.Symbol;
-import org.example.framework.services.tradingAlgorithm.TradingAlgoOne;
-import org.example.framework.services.tradingAlgorithm.TradingAlgoThree;
-import org.example.framework.services.tradingAlgorithm.TradingAlgoTwo;
-import org.example.framework.services.tradingAlgorithm.TradingAlgorithm;
+import org.bitmex.controller.servlet.SendFormServlet;
+import org.bitmex.model.constants.Algo;
+import org.bitmex.model.constants.Symbol;
+import org.bitmex.services.tradingAlgorithm.TradingAlgoOne;
+import org.bitmex.services.tradingAlgorithm.TradingAlgoThree;
+import org.bitmex.services.tradingAlgorithm.TradingAlgoTwo;
+import org.bitmex.services.tradingAlgorithm.TradingAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Bot implements Runnable{
     private Stock stock;
@@ -18,38 +20,34 @@ public class Bot implements Runnable{
     private Double coefficient;
     private Symbol pair = Symbol.XBTUSD;
     private Algo algo = Algo.ALGO_TWO;
+    private static final Logger log = LoggerFactory.getLogger(SendFormServlet.class.getName());
 
     @Override
     public void run() {
-        initializeStock();
         initializeAlgo(algo);
-
-        if(stock.authenticate()) {
-            algorithm.startAlgo();
-        } else {
-            System.out.println("Authentication failed. Please check apiKey and apiSecret.");;
-        }
+        algorithm.startAlgo();
     }
 
     public void stop() {
         algorithm.turnOff();
     }
 
-    private void initializeStock() {
+    public boolean initializeStock() {
         this.stock = new Stock(apiKey, apiSecret, pair);
+        boolean isValid = true;
+        if(!stock.authenticate()) {
+            isValid = false;
+            System.out.println("Authentication failed. Please check apiKey and apiSecret.");
+            log.info("Аутентификация не прошла! ({}, {}, {}, {}, {})", apiKey, apiSecret, step, level, coefficient);
+        }
+        return isValid;
     }
 
     private void initializeAlgo(Algo algo) {
         switch (algo) {
-            case ALGO_ONE:
-                algorithm = new TradingAlgoOne(step, level, coefficient, stock);
-                break;
-            case ALGO_TWO:
-                algorithm = new TradingAlgoTwo(step, level, coefficient, stock);
-                break;
-            case ALGO_THREE:
-                algorithm = new TradingAlgoThree();
-                break;
+            case ALGO_ONE -> algorithm = new TradingAlgoOne();
+            case ALGO_TWO -> algorithm = new TradingAlgoTwo(step, level, coefficient, stock);
+            case ALGO_THREE -> algorithm = new TradingAlgoThree();
         }
     }
 

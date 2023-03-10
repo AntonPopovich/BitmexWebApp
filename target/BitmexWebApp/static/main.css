@@ -7,8 +7,13 @@ form {
     padding: 1em;
     border-radius: 4px;
     width: 380px;
+    margin: 5px;
 }
 
+td {
+    text-align: right;
+
+}
 input {
     width: 350px;
 }
@@ -18,18 +23,21 @@ input[type=submit] {
     width:140px;
     border: 1px solid black;
     border-radius: 6px;
-    background: unset
+    background: unset;
+    margin: 12px;
+}
+
+.bot_form {
+    display:flex;
+    justify-content: center;
+}
+
+.input_fields_wrap {
+    display:flex;
+    flex-wrap: wrap;
+    justify-content: left;
 }
 
 
 
-
-
-/*table {*/
-/*    border: 3px solid black;*/
-/*    padding: 3px;*/
-/*    margin: 50px auto auto;*/
-/*    font-size: 40px;*/
-/*    text-align: center;*/
-/*}*/
 
