@@ -30,6 +30,7 @@ public class SendFormServlet extends HttpServlet {
                 .addLevel(level)
                 .addCoefficient(coefficient)
                 .build();
+
         if (bot.initializeStock()) {
             Thread concBot = new Thread(bot);
             ConcurrentBot concurrentBot = new ConcurrentBot(bot, concBot);
@@ -40,7 +41,7 @@ public class SendFormServlet extends HttpServlet {
             activeBots.getActiveBots().put(curId, concurrentBot);
             currentSession.setAttribute("activeBots", activeBots);
 
-        concurrentBot.turnOn();
+            concurrentBot.turnOn();
             log.info("Запуск потока с данными: {}, {}, {}, {}, {}", apiKey, apiSecret, step, level, coefficient);
             response.getWriter().write("true");
         } else response.getWriter().write("false");

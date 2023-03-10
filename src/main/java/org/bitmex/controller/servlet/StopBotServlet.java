@@ -25,6 +25,4 @@ public class StopBotServlet extends HttpServlet {
         currentSession.setAttribute("activeBots", activeBots);
         log.info("Остановлен бот {}(работают {})", activeBotId, activeBots.getActiveBots().size());
     }
-
-
 }
